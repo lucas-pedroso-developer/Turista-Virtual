@@ -97,9 +97,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
             _ = Pin(
                 latitude: String(pinAnnotation!.coordinate.latitude),
                 longitude: String(pinAnnotation!.coordinate.longitude),
-                context: DataController.shared().viewContext
+                context: dataController.viewContext
             )
             save()
+            //context: DataController.shared().viewContext
         }
     }
     

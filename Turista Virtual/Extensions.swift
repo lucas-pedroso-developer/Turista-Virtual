@@ -17,6 +17,7 @@ extension UIViewController {
     func save() {
         do {
             try appDelegate.dataController.viewContext.save()
+            //try DataController.shared().viewContext.save()
         } catch {
             showInfo(withTitle: "Error", withMessage: "Error while saving Pin location: \(error)")
         }

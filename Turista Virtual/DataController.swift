@@ -18,13 +18,7 @@ struct DataController {
     var viewContext:NSManagedObjectContext {
         return persistentContainer.viewContext
     }
-    
-    static func shared() -> DataController {
-        struct Singleton {
-            static var shared = DataController(modelName: "Turista_Virtual")
-        }
-        return Singleton.shared
-    }
+   
     
     init(modelName: String) {
         persistentContainer = NSPersistentContainer(name: modelName)

@@ -155,8 +155,9 @@ class PhotoViewController: UIViewController {
                 if let url = photo.url {
                     _ = Photo(title: photo.title, url_m: url, forPin: forPin, context: dataController.viewContext)
                     save()
-                    newCollectionButton.isEnabled = true
                 }
+                /*newCollectionButton.isEnabled = true
+                newCollectionButton.isHidden = false*/
             }
         }
     }
@@ -320,6 +321,9 @@ extension PhotoViewController: UICollectionViewDataSource, UICollectionViewDeleg
         if let imageUrl = photo.url_m {
             cancelDownload(imageUrl)
         }
+        
+        newCollectionButton.isEnabled = true
+        newCollectionButton.isHidden = false
     }
     
     private func configImage(using cell: PhotoCollectionCell, photo: Photo, collectionView: UICollectionView, index: IndexPath) {
@@ -392,6 +396,7 @@ extension PhotoViewController: UICollectionViewDataSource, UICollectionViewDeleg
     
     @IBAction func deleteAction(_ sender: Any) {
         newCollectionButton.isEnabled = false
+        newCollectionButton.isHidden = true
         for photos in fetchedResultsController.fetchedObjects! {
             dataController.viewContext.delete(photos)
         }
