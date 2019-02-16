@@ -154,10 +154,12 @@ class PhotoViewController: UIViewController {
             DispatchQueue.main.sync {
                 if let url = photo.url {
                     _ = Photo(title: photo.title, url_m: url, forPin: forPin, context: dataController.viewContext)
-                    save()
+                    do {
+                        try dataController.viewContext.save()
+                    } catch {
+                        showInfo(withTitle: "Error", withMessage: "Error while store photos: \(error)")
+                    }
                 }
-                /*newCollectionButton.isEnabled = true
-                newCollectionButton.isHidden = false*/
             }
         }
     }
@@ -209,7 +211,6 @@ class PhotoViewController: UIViewController {
     }
 
     private func bboxString() -> String {
-        // ensure bbox is bounded by minimum and maximums
         if let latitude = latitude, let longitude = longitude {
             let minimumLon = max(longitude - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
             let minimumLat = max(latitude - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
@@ -308,7 +309,11 @@ extension PhotoViewController: UICollectionViewDataSource, UICollectionViewDeleg
     func deletePhoto(indexPath: IndexPath) {
         let photoToDelete = self.fetchedResultsController.object(at: indexPath)
         self.dataController.viewContext.delete(photoToDelete)
-        save()
+        do {
+            try dataController.viewContext.save()
+        } catch {
+            showInfo(withTitle: "Error", withMessage: "Error while save context: \(error)")
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying: UICollectionViewCell, forItemAt: IndexPath) {
@@ -354,7 +359,13 @@ extension PhotoViewController: UICollectionViewDataSource, UICollectionViewDeleg
                             }
                             photo.image = NSData(data: data)
                             DispatchQueue.global(qos: .background).async {
-                                self.save()
+                                DispatchQueue.main.sync {
+                                    do {
+                                        try self.dataController.viewContext.save()
+                                    } catch {
+                                        self.showInfo(withTitle: "Error", withMessage: "Error while save context: \(error)")
+                                    }
+                                }
                             }
                         }
                     }
@@ -400,7 +411,12 @@ extension PhotoViewController: UICollectionViewDataSource, UICollectionViewDeleg
         for photos in fetchedResultsController.fetchedObjects! {
             dataController.viewContext.delete(photos)
         }
-        save()
+        
+        do {
+            try dataController.viewContext.save()
+        } catch {
+            showInfo(withTitle: "Error", withMessage: "Error while save context: \(error)")
+        }
         fetchPhotosFromAPI(pin!)
     }
     

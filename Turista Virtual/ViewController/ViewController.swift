@@ -32,8 +32,21 @@ class ViewController: UIViewController, MKMapViewDelegate {
         if let pins = loadAllPins() {
             showPins(pins)
         }
+        
+        UserDefaults.standard.synchronize()
+        if let region = UserDefaults.standard.object(forKey: "mapRegion") as! [CLLocationDegrees]! {
+            let center = CLLocationCoordinate2D(latitude: region[0], longitude: region[1])
+            let span = MKCoordinateSpan(latitudeDelta: region[2], longitudeDelta: region[3])
+            let region = MKCoordinateRegion(center: center, span: span)
+            print(center)
+            print(span)
+            print(region)
+            
+            mapView.setRegion(region, animated: true)
+            mapView.regionThatFits(region)
+        }
     }
-    
+     
     func showPins(_ pins: [Pin]) {
         for pin in pins where pin.latitude != nil && pin.longitude != nil {
             let annotation = MKPointAnnotation()
@@ -41,8 +54,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
             let lon = Double(pin.longitude!)!
             annotation.coordinate = CLLocationCoordinate2DMake(lat, lon)
             mapView.addAnnotation(annotation)
-        }
-        mapView.showAnnotations(mapView.annotations, animated: true)
+        }        
     }
 
     @IBAction func edit(_ sender: UIBarButtonItem) {
@@ -99,8 +111,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 longitude: String(pinAnnotation!.coordinate.longitude),
                 context: dataController.viewContext
             )
-            save()
-            //context: DataController.shared().viewContext
+            save()            
         }
     }
     
@@ -172,5 +183,13 @@ extension ViewController {
         ]
         performSegue(withIdentifier: "showPhotos", sender: nil)
     }
+    
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        let region: [CLLocationDegrees] = [self.mapView.region.center.latitude, self.mapView.region.center.longitude, self.mapView.region.span.latitudeDelta, self.mapView.region.span.longitudeDelta]
+        UserDefaults.standard.set(region, forKey: "mapRegion")
+        UserDefaults.standard.synchronize()
+        print(UserDefaults.standard.object(forKey: "mapRegion"))
+    }
+    
 }
 
